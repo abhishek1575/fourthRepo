@@ -7,18 +7,18 @@ import UserDashboard from './Component/User/UserDashboaard';
 
 function App() {
   return (
-    <div>
-      <UserDashboard/>
-    </div>
-    // <Routes>
-    //   <Route path="/" element={<Navigate to="/login" />} />
-    //   <Route path="/login" element={<Login />} />
-    //   <Route path="/forgotpassword" element={<ForgotPassword/>}/>
+    // <div>
+    //   <UserDashboard/>
+    // </div>
+    <Routes>
+      <Route path="/" element={<Navigate to="/login" />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/forgotpassword" element={<ForgotPassword/>}/>
 
-    //   {/* admin path */}
-    //   <Route path='/adashboard' element={<Dashboard2/>}/>
+      {/* admin path */}
+      <Route path='/adashboard' element={<Dashboard2/>}/>
 
-    // </Routes>
+    </Routes>
 
    
     // <Routes>

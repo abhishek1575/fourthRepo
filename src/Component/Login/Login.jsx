@@ -313,12 +313,14 @@ function Login() {
     e.preventDefault();
 
     try {
-      const response =  AuthService.login(email, password);
-
-      if (response.token) {
+      const response =  await AuthService.login(email, password);
+      console.log('response is ',response,'type of', typeof response);
+      
+      // debugger
+      if (response.data.jwt) {
         // Save token and role to session storage
-        sessionStorage.setItem("token", response.token);
-        sessionStorage.setItem("Role", response.role);
+        sessionStorage.setItem("token", response.data.jwt);
+        sessionStorage.setItem("Role", response.data.role);
         sessionStorage.setItem("isLoggedIn", "true");
 
         // Clear previous errors
@@ -326,7 +328,7 @@ function Login() {
         setShowError(false);
 
         // Redirect based on role
-        switch (response.role) {
+        switch (response.data.role) {
           case "ADMIN":
             navigate("/adashboard");
             break;

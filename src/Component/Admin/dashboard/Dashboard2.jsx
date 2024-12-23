@@ -112,7 +112,8 @@
 
 
 //latest
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import {
   AppBar,
   Toolbar,
@@ -140,13 +141,16 @@ import ceinsys_logo from "../../Image/ceinsys_logo.png";
 import AddElement from "../dashboard/AddElement";
 
 import CloseIcon from "@mui/icons-material/Close"; 
-import tableData from "../../../data/tableData";
 import EditForm from "./EditForm";
+import Config from "../../../Service/Config";
+const BASE_URL = Config.API_BASE_URL;
 
 const Dashboard2 = () => {
   const [open, setOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState("Category");
+  const [parentTableData, setParentTableData] = useState([]);
+  const [tableData, setTableData] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('All');
  // State for blinking effect
 
   // Handle Modal Open and Close
@@ -163,6 +167,37 @@ const Dashboard2 = () => {
   const handleCategorySelect = (category) => {
     setSelectedCategory(category);
     handleMenuClose();
+  };
+
+  useEffect(() => {
+    const token = sessionStorage.getItem('token');  // Get the token from sessionStorage
+
+    axios.get(`${BASE_URL}item/getAll`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'  
+      }
+    })
+    .then((response) => {
+      setParentTableData(response.data);
+      setTableData(response.data);  // Store the response data in state
+    })
+    .catch((error) => {
+      console.error("There was an error fetching the data!", error);
+    });
+  }, []);
+
+  const handleCategoryChange = (event) => {
+    const category = event.target.value;
+    setSelectedCategory(category);
+
+    if (category === 'All') {
+      setTableData(parentTableData); // Show all data
+    } else {
+      // Filter based on subCategory
+      const filtered = parentTableData.filter((item) => item.subCategory === category);
+      setTableData(filtered);
+    }
   };
 
 
@@ -239,7 +274,10 @@ const Dashboard2 = () => {
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            <Select defaultValue="All" style={{ marginRight: "16px", width: "120px" }}>
+            <Select defaultValue="All" 
+            value={selectedCategory}
+            onChange={handleCategoryChange}
+             style={{ marginRight: "16px", width: "120px" }}>
               <MenuItem value="All">All</MenuItem>
               <MenuItem value="Electronics">Electronics</MenuItem>
               <MenuItem value="Mechanics">Mechanics</MenuItem>
@@ -292,22 +330,23 @@ const Dashboard2 = () => {
               {tableData.map((row, index) => (
                 <TableRow key={row.id}>
                   <TableCell>{index + 1}</TableCell>
-                  <TableCell>{row.componentName}</TableCell>
+                  <TableCell>{row.name}</TableCell>
                   <TableCell>{row.value}</TableCell>
-                  <TableCell>{row.specification}</TableCell>
+                  <TableCell>{row.description}</TableCell>
                   <TableCell>{row.subCategory}</TableCell>
-                  <TableCell>{row.mfgSupplier}</TableCell>
+                  <TableCell>{row.manufacturer}</TableCell>
                   <TableCell>{row.location}</TableCell>
-                  <TableCell>{row.package}</TableCell>
-                  <TableCell>{row.MPN}</TableCell>
-                  <TableCell>{row.SAP_NO}</TableCell>
+                  <TableCell>{row.package_box}</TableCell>
+                  <TableCell>{row.mpn}</TableCell>
+                  <TableCell>{row.sap_no}</TableCell>
                   <TableCell>{row.stock}</TableCell>
                   <TableCell>
                     <Button
                       variant="contained"
-                      color={row.status === "Available" ? "success" : "error"}
+                      sx={{ textTransform: 'none' }}
+                      color={row.stock > 0  ? "success" : "error"}
                     >
-                      {row.status}
+                      {row.stock > 0  ? "Availaible" : "Unavailaible"}
                     </Button>
                   </TableCell>
                   <TableCell>

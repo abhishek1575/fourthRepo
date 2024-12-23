@@ -70,7 +70,7 @@ export default ForgotPassword;
 //   TextField,
 //   IconButton,
 //   InputAdornment,
-//   Grid2,
+//   Grid22,
 // } from "@mui/material";
 // import { Visibility, VisibilityOff } from "@mui/icons-material";
 // import { useNavigate } from "react-router-dom";
@@ -131,9 +131,9 @@ export default ForgotPassword;
 //         width: "100%",
 //       }}
 //     >
-//       <Grid2 container spacing={0} sx={{ overflowY: "auto" }}>
-//         <Grid2 item xs={false} md={3} lg={3} xl={3} />
-//         <Grid2
+//       <Grid22 container spacing={0} sx={{ overflowY: "auto" }}>
+//         <Grid22 item xs={false} md={3} lg={3} xl={3} />
+//         <Grid22
 //           item
 //           xs={12}
 //           md={6}
@@ -269,8 +269,8 @@ export default ForgotPassword;
 //               </div>
 //             </Box>
 //           </Box>
-//         </Grid2>
-//       </Grid2>
+//         </Grid22>
+//       </Grid22>
 //     </Box>
 //   );
 // };
