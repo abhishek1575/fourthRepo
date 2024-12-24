@@ -179,7 +179,7 @@ const AddElement = ({ handleClose }) => {
             <Select value={subCategory} onChange={handleSubCategoryChange} label="Sub Category">
               <MenuItem value="Sub Category" disabled>Sub Category</MenuItem>
               <MenuItem value="Electronics">Electronics</MenuItem>
-              <MenuItem value="Mechanical">Mechanical</MenuItem>
+              <MenuItem value="Mechanics">Mechanics</MenuItem>
             </Select>
           </FormControl>
         </Grid2>

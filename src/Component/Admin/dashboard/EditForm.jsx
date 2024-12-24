@@ -10,7 +10,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import { updateItem, deleteItem } from "../../../Service/services";
 
-const EditForm = ({ open, handleClose, data, onSave }) => {
+const EditForm = ({ open, handleClose, data }) => {
   const [formData, setFormData] = useState(data);
 
   useEffect(() => {
@@ -27,17 +27,17 @@ const EditForm = ({ open, handleClose, data, onSave }) => {
   const handleSave = async () => {
     try {
       await updateItem(formData.id, formData);
-      onSave();
       handleClose();
     } catch (error) {
       console.error("Error updating item:", error);
     }
   };
 
+  const onSave = ()=>{}
+
   const handleDelete = async () => {
     try {
       await deleteItem(formData.id);
-      onSave();
       handleClose();
     } catch (error) {
       console.error("Error deleting item:", error);

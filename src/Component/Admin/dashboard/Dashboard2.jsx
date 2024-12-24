@@ -147,10 +147,14 @@ const BASE_URL = Config.API_BASE_URL;
 
 const Dashboard2 = () => {
   const [open, setOpen] = useState(false);
+  const [openEditForm, setOpenEditForm] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [parentTableData, setParentTableData] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [searchValue, setSearchValue] = useState("");
+  const [selectedItem, setSelectedItem] = useState({});
+
  // State for blinking effect
 
   // Handle Modal Open and Close
@@ -158,6 +162,9 @@ const Dashboard2 = () => {
   const handleClose = () => {
   
     setOpen(false);
+  };
+  const handleCloseEditForm = () => {
+    setOpenEditForm(false);
   };
 
   // Menu Item Selection
@@ -200,6 +207,22 @@ const Dashboard2 = () => {
     }
   };
 
+  const handleSearchChange = (e) => {
+    debugger
+    const value = e.target.value.toLowerCase(); // Normalize to lowercase for case-insensitive comparison
+    setSearchValue(value);
+
+    const filteredCategoryData =  parentTableData.filter((item) => selectedCategory === "All" || item.subCategory === selectedCategory)
+    const finalFilterData = filteredCategoryData.filter((item) =>
+      Object.values(item).some(
+        (attr) =>
+          typeof attr === "string" &&
+          attr.toLowerCase().includes(value)
+      )
+    );
+
+    setTableData(finalFilterData);
+  };
 
   return (
     <div>
@@ -261,7 +284,7 @@ const Dashboard2 = () => {
       <div
         style={{ marginTop: "60px", padding: "16px", backgroundColor: "#A8D2EF" }}
       >
-        <Typography variant="h5">Welcome Admin</Typography>
+        <Typography variant="h5">Welcome {sessionStorage.getItem("Name")}</Typography>
         <div
           style={{
             display: "flex",
@@ -287,6 +310,8 @@ const Dashboard2 = () => {
               placeholder="Search"
               size="small"
               style={{ marginRight: "16px" }}
+              value={searchValue}
+              onChange={handleSearchChange}
             />
           </div>
           <div>
@@ -359,7 +384,7 @@ const Dashboard2 = () => {
                         color: "#fff", // Text color
                       }}
                       variant="contained"
-                      onClick={<EditForm/>}
+                      onClick={()=>{setOpenEditForm(true); setSelectedItem(row);}}
                       // onClick={() => alert("Edit Clicked")}
                     >
                       Edit
@@ -413,6 +438,7 @@ const Dashboard2 = () => {
         <AddElement handleClose={handleClose} />
       </Box>
     </Modal>
+    <EditForm open={openEditForm} data={selectedItem} handleClose={handleCloseEditForm}/>
     </div>
   );
 };
