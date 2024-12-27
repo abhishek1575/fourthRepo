@@ -1,121 +1,132 @@
-import React from "react";
-import {
-  Box,
-  Grid,
-  TextField,
-  Typography,
-  Button,
-} from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { Grid, Modal, Box, TextField, Button, IconButton, Typography } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import IconButton from "@mui/material/IconButton";
+import { requestItem } from "../../../Service/services";
 
-const AssetForm = ({ assetId, assetName, assetValue, assetDescription }) => {
+const Available = ({ open, handleClose, data, getAllData }) => {
+  const [formData, setFormData] = useState(data);
+  const [availableForm,setAvailableForm] = useState({'userName':sessionStorage.getItem('Name'),'id':data.id});
+
+  useEffect(() => {
+    setFormData(data);
+  }, [data]);
+
+  const handleChange = (ProductItem) => {
+    console.log('productItem is ',ProductItem);
+    
+    setAvailableForm({
+      ...availableForm,
+      [ProductItem.name]: ProductItem.value,
+    });
+  };
+
+  const handleSave = async () => {
+    try {
+      await requestItem(availableForm);
+      console.log('formdata is ',availableForm);
+      
+    } catch (error) {
+      console.error("Error updating item:", error);
+    }
+    getAllData();
+  };
+
+  useEffect(()=>console.log('data is ',data))
+  
+
   return (
-    <Box
-      sx={{
-        backgroundColor: "#b3d9ff",
-        padding: 4,
-        borderRadius: 2,
-        position: "relative",
-        width: "400px",
-        margin: "auto",
-        mt: 4,
-      }}
-    >
-      <IconButton
+    <Modal open={open} onClose={handleClose}>
+      <Box
         sx={{
           position: "absolute",
-          top: 8,
-          right: 8,
-          color: "black",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          bgcolor: "white",
+          boxShadow: 24,
+          p: 4,
+          width: "60%", // Adjust width to make it suitable for two columns
+          borderRadius: 3,
         }}
-        onClick={() => window.location.reload()} // Close and reset
       >
-        <CloseIcon />
-      </IconButton>
+        <Typography variant="h6" mb={2}>
+          Edit Item
+        </Typography>
+        <IconButton
+          onClick={handleClose}
+          sx={{
+            position: "absolute",
+            top: 8,
+            right: 8,
+            backgroundColor: "#f44336",
+            color: "#fff",
+            "&:hover": { backgroundColor: "#d32f2f" },
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
 
-      <Grid container spacing={2} mb={2}>
-        
-        <Grid item xs={6}>
-          <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-            Asset Name - {assetName}
-          </Typography>
-        </Grid>
-      </Grid>
-
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-            Asset Value: {assetValue}
-          </Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-            Description: {assetDescription}
-          </Typography>
-        </Grid>
-        <Grid item xs={6}>
-        <TextField
-          fullWidth
-          label="Required Quantity"
-          variant="outlined"
-          size="small"
-          sx={{ backgroundColor: "#e6e6e6" }}
-          type="text" // Prevent automatic number inputs to allow custom validation
-          onChange={(e) => {
-            const value = e.target.value;
-            // Allow only numbers and prevent negative values
-            if (/^\d*$/.test(value)) {
-              e.target.value = value; // Update the value if valid
-            }
-    }}
-  />
-        </Grid>
-        <Grid item xs={6}>
-          <TextField
-            fullWidth
-            label="User Name"
-            variant="outlined"
-            size="small"
-            sx={{ backgroundColor: "#e6e6e6" }}
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <TextField
-            fullWidth
-            label="Project"
-            variant="outlined"
-            size="small"
-            sx={{ backgroundColor: "#e6e6e6" }}
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <TextField
-            fullWidth
-            label="Remark"
-            variant="outlined"
-            size="small"
-            sx={{ backgroundColor: "#e6e6e6" }}
-          />
+        {/* Grid Layout for Form Fields */}
+        <Grid container spacing={2}>
+          {/* Left Column */}
+          <Grid item xs={12}>
+            <TextField
+              name="componentName"
+              label="Component Name"
+              value={formData.name || ""}
+              disabled
+              sx={{ mb: 2, width: "100%" }}
+            />
+            <TextField
+              name="value"
+              label="Value"
+              value={formData.value || ""}
+              disabled  
+              sx={{ mb: 2, width: "100%" }}
+            />
+            <TextField
+              name="specification"
+              label="Specification"
+              value={formData.description || ""}
+              disabled
+              sx={{ mb: 2, width: "100%" }}
+            />
+            <TextField
+              name="stock"
+              label="Stock"
+              value={availableForm?.stock}
+              onChange={(e)=>handleChange({name:'quantityRequested',value:e.target.value})}
+              sx={{ mb: 2, width: "100%" }}
+              required
+            />
+            <TextField
+              name="projectName"
+              label="projectName"
+              value={availableForm?.projectName}
+              onChange={(e)=>handleChange({name:'projectName',value:e.target.value})}
+              required
+              sx={{ mb: 2, width: "100%" }}
+            />
+            <TextField
+              name="Remark"
+              label="Remark"
+              value={availableForm?.remark}
+              onChange={(e)=>handleChange({name:'remark',value:e.target.value})}
+              sx={{ mb: 2, width: "100%" }}
+              required
+            />
+          </Grid>
         </Grid>
 
-        
-      </Grid>
-
-      <Button
-        variant="contained"
-        sx={{
-          mt: 2,
-          backgroundColor: "#0000ff",
-          color: "white",
-          fontWeight: "bold",
-        }}
-        fullWidth
-      >
-        Submit
-      </Button>
-    </Box>
+        {/* Buttons */}
+        <Box display="flex" justifyContent="space-between" mt={2}>
+          <Button variant="contained" color="primary" onClick={handleSave}>
+            Save
+          </Button>
+        </Box>
+      </Box>
+    </Modal>
   );
 };
 
-export default AssetForm;
+export default Available;

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Box, Button, TextField, Grid2, Select, MenuItem, FormControl, InputLabel, FormHelperText } from "@mui/material";
 
-const AddElement = ({ handleClose }) => {
+const AddElement = ({ handleClose, getAllData }) => {
   const [category, setCategory] = useState("Category");
   const [subCategory, setSubCategory] = useState("Sub Category");
   const [formData, setFormData] = useState({
@@ -125,7 +125,7 @@ const AddElement = ({ handleClose }) => {
         if (!response.ok) {
           throw new Error("Failed to submit the form");
         }
-
+        getAllData();
         handleClose();
       } catch (error) {
         console.error("Error submitting form:", error);
