@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Modal,
-  Box,
-  TextField,
-  Button,
-  IconButton,
-  Typography,
-} from "@mui/material";
+import { Grid, Modal, Box, TextField, Button, IconButton, Typography } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { updateItem, deleteItem } from "../../../Service/services";
 
@@ -55,7 +48,7 @@ const EditForm = ({ open, handleClose, data }) => {
           bgcolor: "white",
           boxShadow: 24,
           p: 4,
-          width: "50%",
+          width: "60%", // Adjust width to make it suitable for two columns
           borderRadius: 3,
         }}
       >
@@ -76,32 +69,86 @@ const EditForm = ({ open, handleClose, data }) => {
           <CloseIcon />
         </IconButton>
 
-        {/* Form Fields */}
-        <TextField
-          fullWidth
-          name="componentName"
-          label="Component Name"
-          value={formData.componentName || ""}
-          onChange={handleChange}
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          fullWidth
-          name="value"
-          label="Value"
-          value={formData.value || ""}
-          onChange={handleChange}
-          sx={{ mb: 2 }}
-        />
-        {/* Add other fields similarly */}
-        <TextField
-          fullWidth
-          name="specification"
-          label="Specification"
-          value={formData.specification || ""}
-          onChange={handleChange}
-          sx={{ mb: 2 }}
-        />
+        {/* Grid Layout for Form Fields */}
+        <Grid container spacing={2}>
+          {/* Left Column */}
+          <Grid item xs={6}>
+            <TextField
+              name="componentName"
+              label="Component Name"
+              value={formData.name || ""}
+              onChange={handleChange}
+              sx={{ mb: 2, width: "100%" }}
+            />
+            <TextField
+              name="value"
+              label="Value"
+              value={formData.value || ""}
+              onChange={handleChange}
+              sx={{ mb: 2, width: "100%" }}
+            />
+            <TextField
+              name="specification"
+              label="Specification"
+              value={formData.description || ""}
+              onChange={handleChange}
+              sx={{ mb: 2, width: "100%" }}
+            />
+            <TextField
+              name="subcategory"
+              label="Sub Category"
+              value={formData.subCategory || ""}
+              onChange={handleChange}
+              sx={{ mb: 2, width: "100%" }}
+            />
+            <TextField
+              name="manufacturer"
+              label="MFG/Supplier"
+              value={formData.manufacturer || ""}
+              onChange={handleChange}
+              sx={{ mb: 2, width: "100%" }}
+            />
+          </Grid>
+
+          {/* Right Column */}
+          <Grid item xs={6}>
+            <TextField
+              name="location"
+              label="Location"
+              value={formData.location || ""}
+              onChange={handleChange}
+              sx={{ mb: 2, width: "100%" }}
+            />
+            <TextField
+              name="package_box"
+              label="Package Box"
+              value={formData.package_box || ""}
+              onChange={handleChange}
+              sx={{ mb: 2, width: "100%" }}
+            />
+            <TextField
+              name="mpn"
+              label="MPN"
+              value={formData.mpn || ""}
+              onChange={handleChange}
+              sx={{ mb: 2, width: "100%" }}
+            />
+            <TextField
+              name="sap_no"
+              label="SAP No"
+              value={formData.sap_no || ""}
+              onChange={handleChange}
+              sx={{ mb: 2, width: "100%" }}
+            />
+            <TextField
+              name="stock"
+              label="Stock"
+              value={formData.stock || ""}
+              onChange={handleChange}
+              sx={{ mb: 2, width: "100%" }}
+            />
+          </Grid>
+        </Grid>
 
         {/* Buttons */}
         <Box display="flex" justifyContent="space-between" mt={2}>
