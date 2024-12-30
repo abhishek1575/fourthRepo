@@ -3,7 +3,7 @@ import { Grid, Modal, Box, TextField, Button, IconButton, Typography } from "@mu
 import CloseIcon from "@mui/icons-material/Close";
 import { updateItem, deleteItem } from "../../../Service/services";
 
-const EditForm = ({ open, handleClose, data }) => {
+const EditForm = ({ open, handleClose, data, getAllData }) => {
   const [formData, setFormData] = useState(data);
 
   useEffect(() => {
@@ -19,11 +19,13 @@ const EditForm = ({ open, handleClose, data }) => {
 
   const handleSave = async () => {
     try {
-      await updateItem(formData.id, formData);
+      
+      await updateItem(formData);
       handleClose();
     } catch (error) {
       console.error("Error updating item:", error);
     }
+    getAllData();
   };
 
   const onSave = ()=>{}
@@ -35,6 +37,7 @@ const EditForm = ({ open, handleClose, data }) => {
     } catch (error) {
       console.error("Error deleting item:", error);
     }
+    getAllData();
   };
 
   return (

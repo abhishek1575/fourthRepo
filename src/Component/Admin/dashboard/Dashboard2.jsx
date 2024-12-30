@@ -140,31 +140,39 @@ import ViewListIcon from "@mui/icons-material/ViewList";
 import ceinsys_logo from "../../Image/ceinsys_logo.png";
 import AddElement from "../dashboard/AddElement";
 
-import CloseIcon from "@mui/icons-material/Close"; 
+import CloseIcon from "@mui/icons-material/Close";
 import EditForm from "./EditForm";
 import Config from "../../../Service/Config";
+import { useNavigate } from "react-router-dom";
+import Available from "./Available";
 const BASE_URL = Config.API_BASE_URL;
 
 const Dashboard2 = () => {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [openEditForm, setOpenEditForm] = useState(false);
+  const [openAvailableForm, setOpenAvailableForm] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [parentTableData, setParentTableData] = useState([]);
   const [tableData, setTableData] = useState([]);
+  const [selectedSubCategory, setSelectedSubCategory] = useState('All');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchValue, setSearchValue] = useState("");
   const [selectedItem, setSelectedItem] = useState({});
 
- // State for blinking effect
+  // State for blinking effect
 
   // Handle Modal Open and Close
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
-  
+
     setOpen(false);
   };
   const handleCloseEditForm = () => {
     setOpenEditForm(false);
+  };
+  const handleCloseAvailbleForm = () => {
+    setOpenAvailableForm(false);
   };
 
   // Menu Item Selection
@@ -176,34 +184,51 @@ const Dashboard2 = () => {
     handleMenuClose();
   };
 
-  useEffect(() => {
-    const token = sessionStorage.getItem('token');  // Get the token from sessionStorage
-
+  const getAllData = () => {
+    const token = sessionStorage.getItem('token');
     axios.get(`${BASE_URL}item/getAll`, {
       headers: {
         'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'  
+        'Content-Type': 'application/json'
       }
     })
-    .then((response) => {
-      setParentTableData(response.data);
-      setTableData(response.data);  // Store the response data in state
-    })
-    .catch((error) => {
-      console.error("There was an error fetching the data!", error);
-    });
+      .then((response) => {
+        setParentTableData(response.data);
+        setTableData(response.data);  // Store the response data in state
+      })
+      .catch((error) => {
+        console.error("There was an error fetching the data!", error);
+      });
+  }
+
+  useEffect(() => {
+    getAllData();
   }, []);
 
-  const handleCategoryChange = (event) => {
-    const category = event.target.value;
-    setSelectedCategory(category);
+  const handleCategoryAndSubCategoryChange = (event, type) => {
+    if (type === "subCategory") {
+      const category = event.target.value;
+      setSelectedSubCategory(category);
 
-    if (category === 'All') {
-      setTableData(parentTableData); // Show all data
+      if (category === 'All') {
+        setTableData(parentTableData); // Show all data
+      } else {
+        // Filter based on subCategory
+        const filtered = parentTableData.filter((item) => item.subCategory === category);
+        setTableData(filtered);
+      }
     } else {
-      // Filter based on subCategory
-      const filtered = parentTableData.filter((item) => item.subCategory === category);
-      setTableData(filtered);
+      const category = event;
+      setSelectedCategory(category);
+
+      if (category === 'All') {
+        setTableData(parentTableData); // Show all data
+      } else {
+        // Filter based on subCategory
+        const filtered = parentTableData.filter((item) => item.category === category);
+        setTableData(filtered);
+      }
+      handleMenuClose();
     }
   };
 
@@ -212,7 +237,8 @@ const Dashboard2 = () => {
     const value = e.target.value.toLowerCase(); // Normalize to lowercase for case-insensitive comparison
     setSearchValue(value);
 
-    const filteredCategoryData =  parentTableData.filter((item) => selectedCategory === "All" || item.subCategory === selectedCategory)
+    const filteredSubCategoryData = parentTableData.filter((item) => selectedSubCategory === "All" || item.subCategory === selectedSubCategory)
+    const filteredCategoryData = filteredSubCategoryData.filter((item) => selectedCategory === "All" || item.category === selectedSubCategory)
     const finalFilterData = filteredCategoryData.filter((item) =>
       Object.values(item).some(
         (attr) =>
@@ -251,10 +277,13 @@ const Dashboard2 = () => {
               open={Boolean(anchorEl)}
               onClose={handleMenuClose}
             >
-              <MenuItem onClick={() => handleCategorySelect("Asset")}>
+              <MenuItem onClick={(e) => { handleCategoryAndSubCategoryChange("All", "Category") }}>
+                All
+              </MenuItem>
+              <MenuItem onClick={(e) => { handleCategoryAndSubCategoryChange("Asset", "Category") }}>
                 Asset
               </MenuItem>
-              <MenuItem onClick={() => handleCategorySelect("Component")}>
+              <MenuItem onClick={(e) => { handleCategoryAndSubCategoryChange("Component", "Category") }}>
                 Component
               </MenuItem>
             </Menu>
@@ -297,10 +326,10 @@ const Dashboard2 = () => {
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            <Select defaultValue="All" 
-            value={selectedCategory}
-            onChange={handleCategoryChange}
-             style={{ marginRight: "16px", width: "120px" }}>
+            <Select defaultValue="All"
+              value={selectedSubCategory}
+              onChange={(e) => { handleCategoryAndSubCategoryChange(e, "subCategory") }}
+              style={{ marginRight: "16px", width: "120px" }}>
               <MenuItem value="All">All</MenuItem>
               <MenuItem value="Electronics">Electronics</MenuItem>
               <MenuItem value="Mechanics">Mechanics</MenuItem>
@@ -369,9 +398,12 @@ const Dashboard2 = () => {
                     <Button
                       variant="contained"
                       sx={{ textTransform: 'none' }}
-                      color={row.stock > 0  ? "success" : "error"}
+                      color={row.stock > 0 ? "success" : "error"}
+                      onClick={() => {if(row.stock>0){
+                        setSelectedItem(row); setOpenAvailableForm(true);
+                      }}}
                     >
-                      {row.stock > 0  ? "Availaible" : "Unavailaible"}
+                      {row.stock > 0 ? "Availaible" : "Unavailaible"}
                     </Button>
                   </TableCell>
                   <TableCell>
@@ -384,8 +416,8 @@ const Dashboard2 = () => {
                         color: "#fff", // Text color
                       }}
                       variant="contained"
-                      onClick={()=>{setOpenEditForm(true); setSelectedItem(row);}}
-                      // onClick={() => alert("Edit Clicked")}
+                      onClick={() => { setOpenEditForm(true); setSelectedItem(row); }}
+                    // onClick={() => alert("Edit Clicked")}
                     >
                       Edit
                     </Button>
@@ -399,46 +431,47 @@ const Dashboard2 = () => {
 
       {/* Add Element Modal */}
       <Modal
-      open={open}
-      onClose={null}  // Prevent closing when clicking outside
-      closeAfterTransition
-    >
-      <Box
-        sx={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          bgcolor: "#fff",
-          boxShadow: 24,
-          borderRadius: 3,
-          p: 4,
-          width: "60%",
-          maxHeight: "80vh",
-          overflowY: "auto",
-          position: "relative" // Add relative positioning to position the close icon
-        }}
+        open={open}
+        onClose={null}  // Prevent closing when clicking outside
+        closeAfterTransition
       >
-        {/* Close Icon in the top right corner */}
-        <IconButton
-          onClick={handleClose}  // Close the modal when clicked
+        <Box
           sx={{
             position: "absolute",
-            top: 8,
-            right: 8,
-            backgroundColor: "#f44336", // Red background for the close button
-            color: "#fff",
-            '&:hover': { backgroundColor: "#d32f2f"}, // Darken red on hover
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            bgcolor: "#fff",
+            boxShadow: 24,
+            borderRadius: 3,
+            p: 4,
+            width: "60%",
+            maxHeight: "80vh",
+            overflowY: "auto",
+            position: "relative" // Add relative positioning to position the close icon
           }}
         >
-          <CloseIcon />
-        </IconButton>
+          {/* Close Icon in the top right corner */}
+          <IconButton
+            onClick={handleClose}  // Close the modal when clicked
+            sx={{
+              position: "absolute",
+              top: 8,
+              right: 8,
+              backgroundColor: "#f44336", // Red background for the close button
+              color: "#fff",
+              '&:hover': { backgroundColor: "#d32f2f" }, // Darken red on hover
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
 
-        {/* Add the form from AddElement */}
-        <AddElement handleClose={handleClose} />
-      </Box>
-    </Modal>
-    <EditForm open={openEditForm} data={selectedItem} handleClose={handleCloseEditForm}/>
+          {/* Add the form from AddElement */}
+          <AddElement handleClose={handleClose} getAllData={getAllData}/>
+        </Box>
+      </Modal>
+      <EditForm open={openEditForm} data={selectedItem} handleClose={handleCloseEditForm} getAllData={getAllData}/>
+      <Available open={openAvailableForm} data={selectedItem} handleClose={handleCloseAvailbleForm} getAllData={getAllData}/>
     </div>
   );
 };
